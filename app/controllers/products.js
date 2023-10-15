@@ -1,9 +1,25 @@
-var Prd = require("../models/product");
+let Prd = require("../models/products");
+
+// Create new product
+module.exports.createPrd = async (req, res, next) => {
+  try {
+    let newPrd = new Prd(req.body);
+    let result = await Prd.createPrd(newPrd);
+    console.log(result);
+    res.json({
+      success: true,
+      message: "Product successfully added.",
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
 
 // Get all products
-module.exports.getAllPrds = async (req, res, next) => {
+module.exports.getAllPrds = async function (req, res, next) {
     try {
-      let allprds = await Prd.find();
+      let allprds = await Prd.find({}, '-category');
       res.json(allprds);
     } catch (error) {
       console.log(error);
@@ -15,7 +31,7 @@ module.exports.getAllPrds = async (req, res, next) => {
 module.exports.prdById = async function (req, res, next) {
     try {
       let id = req.params.prdId;
-      let prd = await Prd.find(id);
+      let prd = await Prd.findone({ _id: id }, '-category');
       res.json(prd);
       next();
     } catch (error) {
@@ -24,20 +40,8 @@ module.exports.prdById = async function (req, res, next) {
     }
 };
 
-// Create new product
-module.exports.createPrd = async (req, res, next) => {
-  try {
-    let newPrd = new Prd(req.body);
-    let result = await Prd.create(newPrd);
-    console.log(result);
-    res.json({
-      success: true,
-      message: "Product successfully added.",
-    });
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
+module.exports.read = async function (req, res, next) {
+  res.json(req.prd);
 };
 
 // Update product by ID
@@ -83,7 +87,4 @@ module.exports.deletePrd = async (req, res) => {
     console.log(error);
     next(error);
   }
-};
-module.exports.read = async function (req, res, next) {
-  res.json(req.prd);
 };
